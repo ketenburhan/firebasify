@@ -5,7 +5,6 @@ const firebasify = (obj) => {
 
   for (let key in obj) {
     if (typeof obj[key] === "object") {
-      console.log(key);
       obj[key] = firebasify(obj[key]);
     }
   }
