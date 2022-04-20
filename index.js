@@ -1,36 +1,70 @@
-const firebasify = (obj) => {
-  if (Array.isArray(obj) && obj.every((item) => item.constructor === Object)) {
-    obj = _firebasify(obj);
-  }
+const getPath = (object, path) =>
+  path.split("/").reduce((p, c) => p && p[c] || null, object);
+const setPath = (object, path, value) =>
+  path
+    .split("/")
+    .reduce(
+      (o, p, i) => o[p] = path.split(".").length === ++i ? value : o[p] || {},
+      object,
+    );
 
-  for (let key in obj) {
-    if (typeof obj[key] === "object") {
-      obj[key] = firebasify(obj[key]);
+const firebasify = (obj, rules, defaultUniqueKey = "id") => {
+  const re = /^(?:(?:((?:[\w\d\s]|\\:)+):)|:)?\/(.*)/g;
+  for (let rule of rules) {
+    const matches = re.exec(rule);
+    let [_, uniqueKey, path] = matches;
+    let currentObj = path === "" ? obj : getPath(obj, path);
+    if (!currentObj) {
+      console.log(`"${path}" is invalid (not found).`);
+      continue;
+    }
+    if (currentObj.constructor === Array) {
+      if (currentObj.every((item) => item.constructor === Object)) {
+        let firebasified = _firebasify(
+          currentObj,
+          uniqueKey || defaultUniqueKey,
+        );
+        if (path === "") {
+          obj = firebasified;
+          continue;
+        }
+        setPath(obj, path, firebasified);
+      } else {
+        console.error(
+          `All elements of ${path} are not objects:`,
+          currentObj,
+        );
+        continue;
+      }
+    } else {
+      console.error(`${path} is not an array.`);
+      continue;
     }
   }
 
   return obj;
 };
 
-const _firebasify = (obj) => {
+const _firebasify = (obj, uniqueKey) => {
   let out = {};
-  let itemsWithoutId = [];
-  let biggestId = 0;
+  let itemsWithoutUniqueKey = [];
+  let biggestUniqueKey = 0;
+
   for (let item of obj) {
-    let id = Number(item.id);
+    let id = Number(item[uniqueKey]);
     if (typeof id === "number" && !Number.isNaN(id)) {
-      out[item.id] = item;
-      if (item.id > biggestId) {
-        biggestId = id;
+      out[id] = item;
+      if (id > biggestUniqueKey) {
+        biggestUniqueKey = id;
       }
     } else {
-      itemsWithoutId.push(item);
+      itemsWithoutUniqueKey.push(item);
     }
   }
 
-  let idNow = biggestId + 1;
-  for (let item of itemsWithoutId) {
-    item.id = idNow;
+  let idNow = biggestUniqueKey + 1;
+  for (let item of itemsWithoutUniqueKey) {
+    item[uniqueKey] = idNow;
     out[idNow] = item;
     idNow++;
   }
