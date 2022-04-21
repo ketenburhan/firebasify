@@ -1,11 +1,11 @@
-let fs = require("fs");
-let commander = require("commander");
+#!/usr/bin/env node
+import { createCommand } from "commander";
 
-let firebasify = require("../index");
-let packageData = require("../package.json");
+import firebasify from "./index";
+import packageData from "../package.json";
+import fs from "fs-extra";
 
-const program = commander
-  .name(packageData.name)
+const program = createCommand(packageData.name)
   .version(packageData.version)
   .arguments("<input-file> <output-file>")
   .usage("<input-file> <output-file> [options]")
@@ -15,7 +15,7 @@ const program = commander
     "after",
     `
 Example:
-  $ ${packageData.name} old.json new.json --rule id:/posts`,
+  $ ${packageData.name} old.json new.json --rule id:/posts`
   )
   .description(packageData.description)
   .parse(process.argv);
