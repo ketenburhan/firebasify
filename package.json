@@ -1,11 +1,11 @@
 {
-  "name": "firebasify-array",
+  "name": "firebasify",
   "version": "0.1.0",
   "description": "",
   "type": "commonjs",
   "main": "lib/index.js",
   "bin": {
-    "firebasify-array": "lib/src/cli.js"
+    "firebasify": "lib/src/cli.js"
   },
   "scripts": {
     "dev": "tsc --watch --preserveWatchOutput",
