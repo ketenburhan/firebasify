@@ -3,7 +3,7 @@
 A tool for restructing your json files to make array-indexing possible in Firebase.
 
 ## Why
-Imagine you have an array stored at Firebase Realtime Database, and you want to get value of an item with a specific `id` (or any unique key identifier). What do you need to do is get the whole array then find the item with that `unique id` in it. This means you should iterate over the array of data.
+Imagine you have an array of objects stored at Firebase Realtime Database, and you want to get value of an item with a specific `id` (or any unique key identifier). What do you need to do is get the whole array then find the item with that `unique id` in it. This means you should iterate over the array of data.
 
 But, what if we store items of that array as `values` of an object and its unique identifier as `key`? We can just get the data with its key.
 
@@ -73,13 +73,13 @@ npx firebasify old.json new.json -r id:/posts
 ```
 
 
-`new.json`:
+`new.json` (prettified):
 ```json
 {
     "posts": {
+        "1": {"id": 1, "content": "lorem"},
         "2": {"id": 2, "content": "ipsum"},
-        "3": {"content": "lorem", "id": 3},
-        "4": {"content": "dolor", "id": 4}
+        "3": {"content": "dolor", "id": 3}
     }
 }
 ```
